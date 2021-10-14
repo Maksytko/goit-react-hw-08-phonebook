@@ -1,36 +1,46 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-const getAllContacts = createAsyncThunk("contacts/getAllContacts", async () => {
-  const res = await fetch("http://localhost:3000/contacts").then((res) =>
-    res.json()
-  );
-  console.log(res);
-  return res;
-});
+const BASE_URL = "https://connections-api.herokuapp.com";
 
-const deleteContact = createAsyncThunk("contacts/deleteContact", async (id) => {
-  await fetch(`http://localhost:3000/contacts/${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-});
+const getAllContacts = createAsyncThunk(
+  "contacts/getAllContacts",
+  async (token) => {
+    const res = await fetch(`${BASE_URL}/contacts`, {
+      method: "GET",
+      headers: {
+        Authorization: token,
+      },
+    }).then((res) => res.json());
+    return res;
+  }
+);
+
+const deleteContact = createAsyncThunk(
+  "contacts/deleteContact",
+  async ({ token, id }) => {
+    await fetch(`${BASE_URL}/contacts/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: token,
+      },
+    });
+  }
+);
 
 const addContact = createAsyncThunk(
   "contacts/addContact",
-  async ({ name, number, id }) => {
-    await fetch(`http://localhost:3000/contacts/`, {
+  async ({ token, name, number }) => {
+    return await fetch(`${BASE_URL}/contacts`, {
       method: "POST",
       headers: {
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         name,
         number,
-        id,
       }),
-    });
+    }).then((res) => res.json());
   }
 );
 

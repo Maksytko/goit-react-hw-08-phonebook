@@ -4,10 +4,11 @@ import style from "./ContactList.module.css";
 import { connect } from "react-redux";
 import { getAllContacts } from "../../redux/contacts-operations";
 import { filteredContacts } from "../../redux/contacts-selectors";
+import { getToken } from "../../redux/user-selectors";
 
-function ContactList({ contacts, getAllContacts }) {
+function ContactList({ token, contacts, getAllContacts }) {
   useEffect(() => {
-    getAllContacts();
+    getAllContacts(token);
   }, []);
 
   return (
@@ -21,11 +22,12 @@ function ContactList({ contacts, getAllContacts }) {
 
 const mapStateToProps = (state) => ({
   contacts: filteredContacts(state),
+  token: getToken(state),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getAllContacts: () => {
-    dispatch(getAllContacts());
+  getAllContacts: (token) => {
+    dispatch(getAllContacts(token));
   },
 });
 

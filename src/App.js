@@ -1,23 +1,52 @@
 import "./App.css";
-import Route from "react-dom";
-// import ContactForm from "./components/ContactForm/ContactForm";
-// import Filter from "./components/Filter/Filter";
-// import ContactList from "./components/ContactList/ContactList";
+import { Link } from "react-router-dom";
 import Header from "./components/Header/Header";
-import Navigation from "./components/Navigation/Navigation";
 import ContactsPage from "./components/ContactsPage/ContactsPage";
+import RegistrationPage from "./components/RegistrationPage/RegistrationPage";
+import LoginPage from "./components/LoginPage/LoginPage";
+import Profile from "./components/Profile/Profile";
+import { connect } from "react-redux";
+import PrivateRoute from "./components/Routes/PrivateRoute";
+import PublicRoute from "./components/Routes/PublicRoute";
+import { getIsLoggedIn } from "./redux/user-selectors";
 
-function App() {
+function App({ isLoggedIn }) {
   return (
     <div className="App">
       <Header>
-        <Navigation />
+        <>
+          {!isLoggedIn ? (
+            <ul>
+              <li>
+                <Link to="/login">Sign in</Link>
+              </li>
+              <li>
+                <Link to="/register">Sign up</Link>
+              </li>
+            </ul>
+          ) : (
+            <Profile />
+          )}
+        </>
       </Header>
-      <Route path="/contacts">
+      <PrivateRoute path="/contacts">
         <ContactsPage />
-      </Route>
+      </PrivateRoute>
+      <PublicRoute path="/login" restricted>
+        <LoginPage />
+      </PublicRoute>
+      <PublicRoute path="/register" restricted>
+        <RegistrationPage />
+      </PublicRoute>
+      <PublicRoute path="/" exact restricted>
+        <h1>Welcome</h1>
+      </PublicRoute>
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  isLoggedIn: getIsLoggedIn(state),
+});
+
+export default connect(mapStateToProps)(App);

@@ -1,22 +1,12 @@
 import { createSelector } from "reselect";
 
 const getContacts = (state) => {
-  return state.contacts.contacts.items;
+  return state.contacts.items;
 };
 
 const getFilterValue = (state) => {
-  return state.contacts.contacts.filter;
+  return state.contacts.filter;
 };
-
-// const filteredContacts = (state) => {
-//   const filteredContacts = getContacts(state).filter((contact) =>
-//     contact.name
-//       .toUpperCase()
-//       .includes(state.contacts.contacts.filter.toUpperCase())
-//   );
-
-//   return filteredContacts;
-// };
 
 const filteredContacts = createSelector(
   [getContacts, getFilterValue],

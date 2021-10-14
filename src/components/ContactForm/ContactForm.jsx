@@ -1,35 +1,31 @@
 import { useState } from "react";
 import style from "./ContactForm.module.css";
 import { connect } from "react-redux";
-import { addItem } from "../../redux/actions";
-import { v4 as uuidv } from "uuid";
 import { addContact } from "../../redux/contacts-operations";
 import { getContacts } from "../../redux/contacts-selectors";
+import { getToken } from "../../redux/user-selectors";
 
-function ContactForm({ contacts, addItem, addContact }) {
+function ContactForm({ token, contacts, addContact }) {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
 
   function handleFormSubmit(event) {
     event.preventDefault();
 
+    addToContactList(name, number);
     setName("");
     setNumber("");
-    addToContactList(name, number);
   }
 
-  function addToContactList(nameForCheck, number) {
+  async function addToContactList(nameForCheck, number) {
     if (
       contacts.find((contact) => {
-        return contact.name === nameForCheck;
+        return contact.name.toUpperCase() === nameForCheck.toUpperCase();
       })
     ) {
       return alert(`${nameForCheck} is already in contacts!`);
     }
-    const id = uuidv();
-    addContact(nameForCheck, number, id);
-
-    return addItem(nameForCheck, number, id);
+    addContact(token, nameForCheck, number);
   }
 
   function handleInputChange(event) {
@@ -73,15 +69,14 @@ function ContactForm({ contacts, addItem, addContact }) {
   );
 }
 
-const mapStateToProps = (state) => {
-  return {
-    contacts: getContacts(state),
-  };
-};
+const mapStateToProps = (state) => ({
+  contacts: getContacts(state),
+  token: getToken(state),
+});
 
 const mapDispatchToProps = (dispatch) => ({
-  addItem: (name, number, id) => dispatch(addItem(name, number, id)),
-  addContact: (name, number, id) => dispatch(addContact({ name, number, id })),
+  addContact: (token, name, number) =>
+    dispatch(addContact({ token, name, number })),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);

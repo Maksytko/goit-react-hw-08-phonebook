@@ -2,11 +2,12 @@ import { connect } from "react-redux";
 import style from "./Contact.module.css";
 import { deleteItem } from "../../redux/actions";
 import { deleteContact } from "../../redux/contacts-operations";
+import { getToken } from "../../redux/user-selectors";
 
-function Contact({ contact, deleteItem, deleteContact }) {
+function Contact({ token, contact, deleteItem, deleteContact }) {
   async function onHandleButtonClick(id) {
+    deleteContact(token, id);
     deleteItem(id);
-    deleteContact(id);
   }
 
   return (
@@ -23,9 +24,13 @@ function Contact({ contact, deleteItem, deleteContact }) {
   );
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  deleteItem: (id) => dispatch(deleteItem(id)),
-  deleteContact: (id) => dispatch(deleteContact(id)),
+const mapStateToProps = (state) => ({
+  token: getToken(state),
 });
 
-export default connect(null, mapDispatchToProps)(Contact);
+const mapDispatchToProps = (dispatch) => ({
+  deleteItem: (id) => dispatch(deleteItem(id)),
+  deleteContact: (token, id) => dispatch(deleteContact({ token, id })),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Contact);
